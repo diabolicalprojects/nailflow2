@@ -1,78 +1,199 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+
 const NAV_ITEMS = [
-    { key: 'home', label: 'Dashboard', icon: '🏠' },
-    { key: 'bookings', label: 'Reservas', icon: '📅' },
+    { key: 'home', label: 'Inicio', icon: 'grid_view' },
+    { key: 'bookings', label: 'Agenda', icon: 'calendar_today' },
     { key: 'services', label: 'Servicios', icon: '💅' },
-    { key: 'staff', label: 'Equipo', icon: '👥' },
-    { key: 'payments', label: 'Pagos', icon: '💳' },
-    { key: 'settings', label: 'Configuración', icon: '⚙️' },
+    { key: 'staff', label: 'Equipo', icon: 'group' },
+    { key: 'payments', label: 'Pagos', icon: 'payments' },
+    { key: 'settings', label: 'Perfil', icon: 'person' },
 ];
 
 export default function DashboardSidebar({ active, onNavigate, isOpen, onClose }) {
+    const [user, setUser] = useState(null);
+    const router = useRouter();
+
+    useEffect(() => {
+        const storedUser = JSON.parse(localStorage.getItem('nailflow_user') || '{}');
+        setUser(storedUser);
+    }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem('nailflow_token');
+        localStorage.removeItem('nailflow_user');
+        router.push('/login');
+    };
+
     return (
-        <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
-            {/* Logo */}
-            <div className="sidebar-logo">
-                <div className="sidebar-logo-icon">💅</div>
-                <div>
-                    <p style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '1.1rem', color: 'var(--color-neutral-900)', lineHeight: 1.2 }}>
-                        NailFlow
-                    </p>
-                    <p style={{ fontSize: '0.7rem', color: 'var(--color-neutral-400)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                        Studio Admin
-                    </p>
+        <aside className={`sidebar ${isOpen ? 'open' : ''}`} style={{
+            width: '280px',
+            backgroundColor: 'white',
+            borderRight: '1px solid rgba(230, 164, 180, 0.15)',
+            display: 'flex',
+            flexDirection: 'column',
+            height: '100vh',
+            position: 'fixed',
+            left: 0,
+            top: 0,
+            zIndex: 100
+        }}>
+            {/* Logo Section */}
+            <div style={{ padding: '32px 24px', borderBottom: '1px solid rgba(230, 164, 180, 0.05)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{
+                        width: '40px',
+                        height: '40px',
+                        backgroundColor: '#E6A4B4',
+                        borderRadius: '12px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '20px',
+                        color: 'white',
+                        boxShadow: '0 4px 12px rgba(230, 164, 180, 0.3)'
+                    }}>💅</div>
+                    <div>
+                        <h2 style={{
+                            fontFamily: 'Playfair Display, serif',
+                            fontSize: '18px',
+                            color: '#4B3F3A',
+                            margin: 0
+                        }}>NailFlow</h2>
+                        <span style={{
+                            fontSize: '10px',
+                            color: '#A0928D',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.1em',
+                            fontWeight: 600
+                        }}>Studio Admin</span>
+                    </div>
                 </div>
             </div>
 
-            {/* Navigation */}
-            <nav className="sidebar-nav">
-                <p className="nav-section-title">Principal</p>
+            {/* Navigation Section */}
+            <nav style={{ flex: 1, padding: '24px 16px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <p style={{
+                    fontSize: '10px',
+                    color: '#D1C8C5',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.1em',
+                    fontWeight: 700,
+                    padding: '0 12px 8px'
+                }}>Menú Principal</p>
+
                 {NAV_ITEMS.map(item => (
                     <button
                         key={item.key}
-                        className={`nav-item ${active === item.key ? 'active' : ''}`}
                         onClick={() => onNavigate(item.key)}
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '12px',
+                            padding: '12px 16px',
+                            borderRadius: '16px',
+                            border: 'none',
+                            background: active === item.key ? 'rgba(230, 164, 180, 0.1)' : 'transparent',
+                            color: active === item.key ? '#E6A4B4' : '#6D5D57',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s',
+                            textAlign: 'left',
+                            fontWeight: active === item.key ? 600 : 500
+                        }}
                     >
-                        <span className="nav-item-icon">{item.icon}</span>
-                        {item.label}
+                        {item.icon.length > 2 ? (
+                            <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>{item.icon}</span>
+                        ) : (
+                            <span style={{ fontSize: '18px' }}>{item.icon}</span>
+                        )}
+                        <span style={{ fontSize: '14px' }}>{item.label}</span>
                     </button>
                 ))}
 
-                <div style={{ borderTop: '1px solid var(--color-pink-100)', margin: '24px 0 12px' }} />
-
-                {/* Booking link */}
-                <div style={{ padding: '0 12px' }}>
-                    <p style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-neutral-400)', marginBottom: 8, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-                        Link de reservas
-                    </p>
-                    <div style={{
-                        background: 'var(--color-pink-50)',
-                        borderRadius: 'var(--radius-md)',
-                        padding: '10px 12px',
-                        fontSize: '0.8rem',
-                        color: 'var(--brand-deep)',
-                        fontWeight: 500,
-                        cursor: 'pointer',
-                    }}
+                <div style={{ padding: '24px 12px 8px' }}>
+                    <p style={{
+                        fontSize: '10px',
+                        color: '#D1C8C5',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.1em',
+                        fontWeight: 700,
+                        marginBottom: '12px'
+                    }}>Tu Studio</p>
+                    <div
                         onClick={() => window.open('/', '_blank')}
+                        style={{
+                            padding: '14px',
+                            backgroundColor: '#FAF3F0',
+                            borderRadius: '16px',
+                            cursor: 'pointer',
+                            border: '1px solid rgba(230, 164, 180, 0.1)',
+                            transition: 'all 0.2s'
+                        }}
                     >
-                        🔗 domain.com <span style={{ opacity: 0.6 }}>/book/slug</span>
+                        <p style={{ fontSize: '11px', color: '#A0928D', marginBottom: '4px' }}>Link de Reservas</p>
+                        <p style={{ fontSize: '13px', color: '#E6A4B4', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>link</span>
+                            Ver página pública
+                        </p>
                     </div>
                 </div>
             </nav>
 
-            {/* Bottom */}
-            <div style={{ padding: '16px', borderTop: '1px solid var(--color-pink-100)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div className="avatar" style={{ width: 36, height: 36, fontSize: '0.8rem' }}>A</div>
+            {/* User Profile Section */}
+            <div style={{ padding: '24px', borderTop: '1px solid rgba(230, 164, 180, 0.05)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                    <div style={{
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: '50%',
+                        backgroundColor: '#F3D7CA',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: '#4B3F3A',
+                        fontWeight: 700,
+                        fontSize: '14px'
+                    }}>
+                        {user?.name?.[0] || 'A'}
+                    </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--color-neutral-800)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            Admin
+                        <p style={{
+                            fontSize: '14px',
+                            fontWeight: 600,
+                            color: '#4B3F3A',
+                            margin: 0,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap'
+                        }}>{user?.name || 'Administrador'}</p>
+                        <p style={{ fontSize: '11px', color: '#A0928D', margin: 0 }}>
+                            {user?.role === 'superadmin' ? 'Superusuario' : 'Dueña de Negocio'}
                         </p>
-                        <p style={{ fontSize: '0.75rem', color: 'var(--color-neutral-400)' }}>Studio Manager</p>
                     </div>
                 </div>
+                <button
+                    onClick={handleLogout}
+                    style={{
+                        width: '100%',
+                        padding: '10px',
+                        borderRadius: '12px',
+                        border: '1px solid rgba(224, 122, 122, 0.2)',
+                        backgroundColor: 'transparent',
+                        color: '#E07A7A',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px'
+                    }}
+                >
+                    <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>logout</span>
+                    Cerrar Sesión
+                </button>
             </div>
         </aside>
     );

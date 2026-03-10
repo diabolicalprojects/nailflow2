@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import DashboardSidebar from '../../components/dashboard/DashboardSidebar';
 import DashboardHome from '../../components/dashboard/DashboardHome';
 import DashboardServices from '../../components/dashboard/DashboardServices';
@@ -21,19 +22,28 @@ const SECTIONS = {
 export default function DashboardPage() {
     const [activeSection, setActiveSection] = useState('home');
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const router = useRouter();
+
+    useEffect(() => {
+        const token = localStorage.getItem('nailflow_token');
+        const user = JSON.parse(localStorage.getItem('nailflow_user') || '{}');
+
+        if (!token) {
+            router.push('/login');
+        } else if (user.role === 'superadmin') {
+            router.push('/dashboard/super');
+        } else {
+            setLoading(false);
+        }
+    }, [router]);
+
+    if (loading) return null;
 
     const Section = SECTIONS[activeSection] || DashboardHome;
 
     return (
-        <div className="dashboard-layout">
-            {/* Mobile overlay */}
-            {sidebarOpen && (
-                <div
-                    style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.3)', zIndex: 150 }}
-                    onClick={() => setSidebarOpen(false)}
-                />
-            )}
-
+        <div className="dashboard-layout" style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#FAF3F0' }}>
             <DashboardSidebar
                 active={activeSection}
                 onNavigate={(section) => { setActiveSection(section); setSidebarOpen(false); }}
@@ -41,24 +51,13 @@ export default function DashboardPage() {
                 onClose={() => setSidebarOpen(false)}
             />
 
-            <main className="main-content">
-                {/* Mobile Header */}
-                <div style={{
-                    display: 'none',
-                    alignItems: 'center',
-                    gap: 16,
-                    marginBottom: 24,
-                    '@media (max-width: 768px)': { display: 'flex' },
-                }}>
-                    <button
-                        className="btn btn-ghost btn-icon"
-                        onClick={() => setSidebarOpen(true)}
-                        style={{ display: 'block' }}
-                    >
-                        ☰
-                    </button>
-                </div>
-
+            <main className="main-content" style={{
+                flex: 1,
+                marginLeft: '280px',
+                padding: '40px 60px',
+                height: '100vh',
+                overflowY: 'auto'
+            }}>
                 <Section />
             </main>
         </div>

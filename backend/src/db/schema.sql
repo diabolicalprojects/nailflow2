@@ -100,7 +100,20 @@ CREATE TABLE IF NOT EXISTS system_settings (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Users table for authentication
+CREATE TABLE IF NOT EXISTS users (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  business_id UUID REFERENCES businesses(id) ON DELETE SET NULL,
+  name VARCHAR(255) NOT NULL,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL,
+  role VARCHAR(20) NOT NULL DEFAULT 'owner', -- 'superadmin', 'owner'
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- Indexes
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_business_id ON users(business_id);
 CREATE INDEX IF NOT EXISTS idx_bookings_business_id ON bookings(business_id);
 CREATE INDEX IF NOT EXISTS idx_bookings_date ON bookings(booking_date);
 CREATE INDEX IF NOT EXISTS idx_bookings_staff_id ON bookings(staff_id);

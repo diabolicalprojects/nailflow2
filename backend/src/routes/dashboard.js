@@ -1,17 +1,30 @@
 const express = require('express');
 const pool = require('../db/pool');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
+const SECRET = process.env.JWT_SECRET || 'nailflow_secret_key_2024';
 
 // Simple auth middleware (token-based)
 const authMiddleware = (req, res, next) => {
     const token = req.headers.authorization?.replace('Bearer ', '');
-    if (!token || token !== process.env.DASHBOARD_SECRET) {
-        // For demo: allow if no secret set
+
+    if (!token) {
         if (!process.env.DASHBOARD_SECRET) return next();
         return res.status(401).json({ error: 'Unauthorized' });
     }
-    next();
+
+    try {
+        const decoded = jwt.verify(token, SECRET);
+        req.user = decoded;
+        next();
+    } catch (err) {
+        // Fallback for the static dashboard secret for backward compatibility
+        if (token === process.env.DASHBOARD_SECRET) return next();
+        return res.status(401).json({ error: 'Invalid token' });
+    }
 };
+
+router.use(authMiddleware);
 
 // GET /api/dashboard/bookings
 router.get('/bookings', async (req, res) => {

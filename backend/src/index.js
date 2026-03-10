@@ -11,6 +11,7 @@ const bookingRouter = require('./routes/booking');
 const paymentRouter = require('./routes/payment');
 const imagesRouter = require('./routes/images');
 const dashboardRouter = require('./routes/dashboard');
+const authRouter = require('./routes/auth');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -36,6 +37,7 @@ app.use('/api/booking', bookingRouter);
 app.use('/api/payment', paymentRouter);
 app.use('/api/reference-images', imagesRouter);
 app.use('/api/dashboard', dashboardRouter);
+app.use('/api/auth', authRouter);
 
 // 404 handler
 app.use((req, res) => {

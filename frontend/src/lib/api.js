@@ -8,6 +8,15 @@ const api = axios.create({
     headers: { 'Content-Type': 'application/json' },
 });
 
+// Interceptor to add token
+api.interceptors.request.use(config => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('nailflow_token') : null;
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
+
 // Services
 export const getServices = () => api.get('/api/services').then(r => r.data);
 
