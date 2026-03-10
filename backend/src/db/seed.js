@@ -63,7 +63,7 @@ async function seed() {
                 ($1, 'Esmaltado Semipermanente', 'Limpieza y esmaltado de alta duración con brillo intenso.', 32.00, 60, 30, true),
                 ($1, 'Baño de Acrílico', 'Fortalecimiento de uña natural con capa protectora de acrílico.', 35.00, 75, 50, true),
                 ($1, 'Retiro Terapéutico', 'Remoción segura sin daño a la uña natural con agentes nutritivos.', 18.00, 45, 0, true)
-            ON CONFLICT (business_id, name) DO UPDATE SET description = EXCLUDED.description, price = EXCLUDED.price
+            ON CONFLICT DO NOTHING
         `, [businessId]);
 
     // System Settings

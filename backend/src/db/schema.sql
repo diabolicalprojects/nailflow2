@@ -37,7 +37,8 @@ CREATE TABLE IF NOT EXISTS services (
   deposit_percentage INTEGER NOT NULL DEFAULT 30,
   image_url TEXT,
   is_active BOOLEAN DEFAULT true,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE (business_id, name)
 );
 
 -- Clients table
