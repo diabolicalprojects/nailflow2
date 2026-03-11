@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getAvailableTimes } from '../../lib/api';
+import { getAvailability } from '../../lib/api';
 
 export default function DateTimeStep({ selectedDate, selectedTime, staffId, serviceDuration, onSelect, onBack }) {
     const [date, setDate] = useState(selectedDate || new Date().toISOString().split('T')[0]);
@@ -14,8 +14,8 @@ export default function DateTimeStep({ selectedDate, selectedTime, staffId, serv
             async function loadTimes() {
                 setLoading(true);
                 try {
-                    const data = await getAvailableTimes(staffId, date, serviceDuration);
-                    setTimes(data);
+                    const data = await getAvailability(date, staffId);
+                    setTimes(data.available_slots || []);
                 } catch (err) {
                     console.error('Error fetching times:', err);
                 } finally {

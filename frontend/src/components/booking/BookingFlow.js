@@ -73,8 +73,12 @@ export default function BookingFlow({ staffSlug }) {
                     const staffData = await getStaffBySlug(staffSlug);
                     setStaff(staffData);
                     setBooking(prev => ({ ...prev, staffId: staffData.id }));
-                } else if (servicesData.length > 0) {
-                    // Default behavior
+                } else {
+                    const allStaff = await import('../../lib/api').then(m => m.getAllStaff());
+                    if (allStaff?.length > 0) {
+                        setStaff(allStaff[0]);
+                        setBooking(prev => ({ ...prev, staffId: allStaff[0].id }));
+                    }
                 }
             } catch (err) {
                 setError('Failed to load booking data. Please try again.');

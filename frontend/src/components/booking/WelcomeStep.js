@@ -17,12 +17,18 @@ export default function WelcomeStep({ onNext, booking, onUpdate, staff }) {
         <div className="flex-1 flex flex-col p-8 animate-fade-in">
             <header className="flex flex-col items-center mb-12 mt-8">
                 <div className="relative mb-6">
-                    <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-soft-lg">
-                        <img
-                            alt={staff?.name || "Nail Tech"}
-                            className="w-full h-full object-cover"
-                            src={staff?.image_url || "https://images.unsplash.com/photo-1599420186946-7b6fb4e297f0?q=80&w=200&h=200&auto=format&fit=crop"}
-                        />
+                    <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-soft-lg bg-stone-50 flex items-center justify-center">
+                        {staff?.profile_image ? (
+                            <img
+                                alt={staff?.name || "Nail Tech"}
+                                className="w-full h-full object-cover"
+                                src={staff.profile_image}
+                            />
+                        ) : (
+                            <span className="text-4xl text-stone-300 font-display italic">
+                                {staff?.name?.charAt(0) || 'LM'}
+                            </span>
+                        )}
                     </div>
                 </div>
                 <h1 className="font-display text-4xl font-medium text-stone-900 mb-2 italic">

@@ -160,10 +160,10 @@ export default function DashboardStaff() {
 
             {/* Modal Form */}
             {showForm && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 min-h-screen">
                     <div className="absolute inset-0 bg-stone-900/40 backdrop-blur-sm" onClick={closeForm} />
 
-                    <div className="bg-white rounded-[3rem] w-full max-w-lg max-h-[90vh] overflow-y-auto z-10 shadow-2xl relative animate-in fade-in zoom-in duration-300 scrollbar-hide">
+                    <div className="bg-white rounded-[3rem] w-full max-w-2xl max-h-[90vh] overflow-y-auto z-10 shadow-2xl relative animate-in fade-in zoom-in duration-300 scrollbar-hide">
                         <header className="sticky top-0 bg-white/80 backdrop-blur-md px-10 py-8 border-b border-stone-100 flex items-center justify-between z-20">
                             <button onClick={closeForm} className="w-10 h-10 rounded-full bg-stone-50 flex items-center justify-center text-stone-400 hover:text-primary transition-colors">
                                 <span className="material-symbols-outlined text-xl">close</span>
