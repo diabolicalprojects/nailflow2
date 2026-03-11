@@ -21,7 +21,6 @@ const SECTIONS = {
 
 export default function DashboardPage() {
     const [activeSection, setActiveSection] = useState('home');
-    const [sidebarOpen, setSidebarOpen] = useState(false);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
 
@@ -43,23 +42,53 @@ export default function DashboardPage() {
     const Section = SECTIONS[activeSection] || DashboardHome;
 
     return (
-        <div className="dashboard-layout" style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#FAF3F0' }}>
-            <DashboardSidebar
-                active={activeSection}
-                onNavigate={(section) => { setActiveSection(section); setSidebarOpen(false); }}
-                isOpen={sidebarOpen}
-                onClose={() => setSidebarOpen(false)}
-            />
+        <>
+            <div className="dashboard-layout">
+                <DashboardSidebar
+                    active={activeSection}
+                    onNavigate={(section) => setActiveSection(section)}
+                    onClose={() => { }}
+                />
 
-            <main className="main-content" style={{
-                flex: 1,
-                marginLeft: '280px',
-                padding: '40px 60px',
-                height: '100vh',
-                overflowY: 'auto'
-            }}>
-                <Section />
-            </main>
-        </div>
+                <main className="dashboard-main">
+                    <Section />
+                </main>
+            </div>
+
+            <style jsx global>{`
+                .dashboard-layout {
+                    display: flex;
+                    min-height: 100vh;
+                    background: linear-gradient(135deg, #FAF3F0 0%, #FDF8F5 50%, #F7F0ED 100%);
+                }
+
+                .dashboard-main {
+                    flex: 1;
+                    margin-left: 260px;
+                    padding: 44px 52px 80px;
+                    min-height: 100vh;
+                    overflow-y: auto;
+                    transition: margin-left 0.3s ease;
+                }
+
+                @media (max-width: 768px) {
+                    .dashboard-main {
+                        margin-left: 0 !important;
+                        padding: 28px 20px 100px;
+                    }
+                }
+
+                @media (max-width: 480px) {
+                    .dashboard-main {
+                        padding: 20px 16px 100px;
+                    }
+                }
+
+                @keyframes pulse {
+                    0%, 100% { opacity: 1; }
+                    50% { opacity: 0.4; }
+                }
+            `}</style>
+        </>
     );
 }

@@ -9,6 +9,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPass, setShowPass] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const router = useRouter();
@@ -28,126 +29,94 @@ export default function LoginPage() {
                 router.push('/dashboard');
             }
         } catch (err) {
-            setError(err.response?.data?.error || 'Error al iniciar sesión');
+            setError(err.response?.data?.error || 'Credenciales incorrectas');
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div style={{
-            minHeight: '100vh',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: '#FAF3F0',
-            padding: '24px'
-        }}>
-            <div style={{
-                width: '100%',
-                maxWidth: '400px',
-                backgroundColor: 'rgba(255, 255, 255, 0.45)',
-                backdropFilter: 'blur(16px)',
-                borderRadius: '32px',
-                padding: '40px',
-                boxShadow: '0 12px 32px rgba(230, 164, 180, 0.15)',
-                border: '1px solid rgba(255, 255, 255, 0.5)'
-            }}>
-                <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-                    <div style={{
-                        fontSize: '32px',
-                        marginBottom: '12px',
-                        color: '#E6A4B4'
-                    }}>💅</div>
-                    <h1 style={{
-                        fontFamily: 'Playfair Display, serif',
-                        fontSize: '28px',
-                        color: '#4B3F3A',
-                        margin: 0
-                    }}>NailFlow Admin</h1>
-                    <p style={{
-                        fontSize: '12px',
-                        color: '#A0928D',
-                        marginTop: '8px',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.1em'
-                    }}>Ingreso al sistema</p>
-                </div>
+        <div className="min-h-screen bg-bg-light flex items-center justify-center p-6 font-sans antialiased relative overflow-hidden">
+            {/* Background Decor */}
+            <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-primary/10 blur-[120px] pointer-events-none" />
+            <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-accent/10 blur-[120px] pointer-events-none" />
 
-                <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                        <label style={{ fontSize: '12px', fontWeight: 600, color: '#6D5D57' }}>Email</label>
-                        <input
-                            type="email"
-                            required
-                            style={{
-                                padding: '14px 18px',
-                                borderRadius: '16px',
-                                border: '1px solid rgba(230, 164, 180, 0.3)',
-                                fontSize: '14px',
-                                outline: 'none',
-                                transition: 'all 0.2s',
-                                backgroundColor: 'rgba(255, 255, 255, 0.6)'
-                            }}
-                            placeholder="admin@nailflow.com"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                        />
-                    </div>
-
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                        <label style={{ fontSize: '12px', fontWeight: 600, color: '#6D5D57' }}>Contraseña</label>
-                        <input
-                            type="password"
-                            required
-                            style={{
-                                padding: '14px 18px',
-                                borderRadius: '16px',
-                                border: '1px solid rgba(230, 164, 180, 0.3)',
-                                fontSize: '14px',
-                                outline: 'none',
-                                transition: 'all 0.2s',
-                                backgroundColor: 'rgba(255, 255, 255, 0.6)'
-                            }}
-                            placeholder="••••••••"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
-                    </div>
-
-                    {error && (
-                        <div style={{
-                            color: '#E07A7A',
-                            fontSize: '13px',
-                            textAlign: 'center',
-                            backgroundColor: 'rgba(224, 122, 122, 0.1)',
-                            padding: '10px',
-                            borderRadius: '12px'
-                        }}>
-                            {error}
+            <div className="w-full max-w-md z-10">
+                <div className="bg-white/70 backdrop-blur-xl rounded-[3rem] p-10 shadow-soft-lg border border-white/50 animate-fade-in">
+                    <header className="text-center mb-10">
+                        <div className="w-20 h-20 bg-gradient-to-br from-primary to-accent rounded-3xl flex items-center justify-center text-3xl mx-auto mb-6 shadow-soft-md">
+                            💅
                         </div>
-                    )}
+                        <h1 className="font-display italic text-4xl text-stone-900 mb-2">NailFlow</h1>
+                        <p className="text-[10px] uppercase tracking-[0.25em] text-stone-400 font-bold">Studio Management</p>
+                    </header>
 
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        style={{
-                            marginTop: '10px',
-                            backgroundColor: '#E6A4B4',
-                            color: 'white',
-                            padding: '16px',
-                            borderRadius: '20px',
-                            border: 'none',
-                            fontSize: '15px',
-                            fontWeight: 600,
-                            cursor: 'pointer',
-                            boxShadow: '0 8px 20px rgba(230, 164, 180, 0.3)',
-                            transition: 'transform 0.2s, opacity 0.2s'
-                        }}
-                    >
-                        {loading ? 'Iniciando...' : 'Entrar'}
-                    </button>
-                </form>
+                    <form onSubmit={handleLogin} className="space-y-6">
+                        <div className="space-y-2">
+                            <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-widest ml-1">Email</label>
+                            <input
+                                type="email"
+                                required
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="tu@email.com"
+                                className="w-full bg-white border border-stone-100 rounded-3xl px-6 py-4 text-sm font-display text-stone-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:italic placeholder:text-stone-300 shadow-sm"
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-widest ml-1">Contraseña</label>
+                            <div className="relative">
+                                <input
+                                    type={showPass ? 'text' : 'password'}
+                                    required
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    placeholder="••••••••"
+                                    className="w-full bg-white border border-stone-100 rounded-3xl px-6 py-4 text-sm font-display text-stone-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-stone-300 shadow-sm"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPass(p => !p)}
+                                    className="absolute right-5 top-1/2 -translate-y-1/2 text-stone-300 hover:text-stone-500 transition-colors"
+                                >
+                                    <span className="material-symbols-outlined text-[20px]">
+                                        {showPass ? 'visibility_off' : 'visibility'}
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+
+                        {error && (
+                            <div className="flex items-center gap-3 text-red-400 bg-red-50/50 border border-red-100 p-4 rounded-2xl animate-shake">
+                                <span className="material-symbols-outlined text-lg">error</span>
+                                <p className="text-xs font-medium">{error}</p>
+                            </div>
+                        )}
+
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="w-full bg-primary text-white py-5 rounded-full shadow-soft-md hover:shadow-soft-lg active:scale-[0.98] transition-all flex items-center justify-center gap-3 mt-8"
+                        >
+                            {loading ? (
+                                <span className="spinner w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></span>
+                            ) : (
+                                <>
+                                    <span className="font-display text-lg tracking-wide">Ingresar al Studio</span>
+                                    <span className="material-symbols-outlined font-light">arrow_forward</span>
+                                </>
+                            )}
+                        </button>
+                    </form>
+
+                    <footer className="mt-12 text-center">
+                        <p className="text-[10px] text-stone-300 italic font-medium leading-relaxed">
+                            Acceso exclusivo para personal autorizado. <br />
+                            &copy; 2024 NailFlow Studio.
+                        </p>
+                    </footer>
+                </div>
             </div>
         </div>
     );

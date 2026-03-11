@@ -135,13 +135,13 @@ router.get('/staff', async (req, res) => {
 // POST /api/dashboard/staff/create
 router.post('/staff/create', async (req, res) => {
     try {
-        const { name, role, phone, booking_slug, profile_image } = req.body;
+        const { name, role, phone, booking_slug, profile_image, specialty } = req.body;
         const business = await pool.query('SELECT id FROM businesses LIMIT 1');
         const slug = role === 'director' ? null : booking_slug;
         const result = await pool.query(
-            `INSERT INTO staff (business_id, name, role, phone, booking_slug, profile_image)
-       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-            [business.rows[0].id, name, role || 'staff', phone, slug, profile_image]
+            `INSERT INTO staff (business_id, name, role, phone, booking_slug, profile_image, specialty)
+       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+            [business.rows[0].id, name, role || 'staff', phone, slug, profile_image, specialty]
         );
         res.status(201).json(result.rows[0]);
     } catch (err) {
@@ -152,12 +152,12 @@ router.post('/staff/create', async (req, res) => {
 // PUT /api/dashboard/staff/update
 router.put('/staff/update', async (req, res) => {
     try {
-        const { id, name, role, phone, booking_slug, is_active, profile_image } = req.body;
+        const { id, name, role, phone, booking_slug, is_active, profile_image, specialty } = req.body;
         const slug = role === 'director' ? null : booking_slug;
         const result = await pool.query(
-            `UPDATE staff SET name=$1, role=$2, phone=$3, booking_slug=$4, is_active=$5, profile_image=$6
-       WHERE id=$7 RETURNING *`,
-            [name, role, phone, slug, is_active, profile_image, id]
+            `UPDATE staff SET name=$1, role=$2, phone=$3, booking_slug=$4, is_active=$5, profile_image=$6, specialty=$7
+       WHERE id=$8 RETURNING *`,
+            [name, role, phone, slug, is_active, profile_image, specialty, id]
         );
         res.json(result.rows[0]);
     } catch (err) {

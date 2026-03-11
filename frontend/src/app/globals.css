@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
   /* Stitch Remix Aesthetic — Soft Rose & Cream Theme */
   --brand-primary: #E6A4B4;

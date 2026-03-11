@@ -1,9 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { getDashboardStaff, createStaff, updateStaff, deleteStaff } from '../../lib/api';
+import axios from 'axios';
 
-const emptyStaff = { name: '', role: 'staff', phone: '', booking_slug: '', profile_image: '' };
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
+const emptyStaff = { name: '', role: 'staff', phone: '', booking_slug: '', specialty: '' };
 
 export default function DashboardStaff() {
     const [staff, setStaff] = useState([]);
@@ -12,23 +15,80 @@ export default function DashboardStaff() {
     const [editing, setEditing] = useState(null);
     const [showForm, setShowForm] = useState(false);
     const [saving, setSaving] = useState(false);
+    const [imageFile, setImageFile] = useState(null);
+    const [imagePreview, setImagePreview] = useState('');
+    const [uploadingImage, setUploadingImage] = useState(false);
+    const fileRef = useRef(null);
 
-    const load = () => getDashboardStaff().then(setStaff).catch(console.error).finally(() => setLoading(false));
+    const load = () => getDashboardStaff()
+        .then(setStaff)
+        .catch(console.error)
+        .finally(() => setLoading(false));
+
     useEffect(() => { load(); }, []);
 
-    const openNew = () => { setForm(emptyStaff); setEditing(null); setShowForm(true); };
-    const openEdit = (s) => { setForm(s); setEditing(s.id); setShowForm(true); };
-    const closeForm = () => { setShowForm(false); setEditing(null); };
+    const openNew = () => {
+        setForm(emptyStaff);
+        setEditing(null);
+        setImageFile(null);
+        setImagePreview('');
+        setShowForm(true);
+    };
+
+    const openEdit = (s) => {
+        setForm(s);
+        setEditing(s.id);
+        setImageFile(null);
+        setImagePreview(s.profile_image || '');
+        setShowForm(true);
+    };
+
+    const closeForm = () => {
+        setShowForm(false);
+        setEditing(null);
+        setForm(emptyStaff);
+        setImageFile(null);
+        setImagePreview('');
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setImageFile(file);
+        setImagePreview(URL.createObjectURL(file));
+    };
+
+    const uploadImageToCDN = async (file) => {
+        const formData = new FormData();
+        formData.append('images', file);
+        formData.append('booking_id', 'staff-profile');
+        const token = localStorage.getItem('nailflow_token');
+        const res = await axios.post(`${API_URL}/api/reference-images/upload`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                ...(token ? { Authorization: `Bearer ${token}` } : {})
+            }
+        });
+        return res.data?.urls?.[0] || res.data?.[0]?.url || '';
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSaving(true);
         try {
-            if (editing) await updateStaff({ ...form, id: editing });
-            else await createStaff(form);
+            let profileImageUrl = form.profile_image || '';
+            if (imageFile) {
+                setUploadingImage(true);
+                profileImageUrl = await uploadImageToCDN(imageFile);
+                setUploadingImage(false);
+            }
+            const payload = { ...form, profile_image: profileImageUrl };
+            if (editing) await updateStaff({ ...payload, id: editing });
+            else await createStaff(payload);
             closeForm();
             load();
         } catch (err) {
+            setUploadingImage(false);
             alert(err.response?.data?.error || 'Error al guardar');
         } finally {
             setSaving(false);
@@ -39,115 +99,251 @@ export default function DashboardStaff() {
     const members = staff.filter(s => s.role !== 'director');
 
     return (
-        <div>
-            <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div className="animate-fade-in max-w-6xl mx-auto">
+            {/* Header */}
+            <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
                 <div>
-                    <h1 className="page-title">Equipo</h1>
-                    <p className="page-subtitle">Administra tu equipo de especialistas</p>
+                    <p className="text-[10px] uppercase tracking-[0.3em] font-bold text-stone-400 mb-3">Gestión de Equipo</p>
+                    <h1 className="text-4xl lg:text-5xl font-display italic text-stone-900 leading-tight">Especialistas</h1>
                 </div>
-                <button className="btn btn-primary" onClick={openNew}>+ Agregar Miembro</button>
-            </div>
+                <button
+                    onClick={openNew}
+                    className="bg-primary text-white px-8 py-4 rounded-full shadow-soft-md hover:shadow-soft-lg active:scale-[0.98] transition-all flex items-center justify-center gap-3 font-display text-lg"
+                >
+                    <span className="material-symbols-outlined text-xl">person_add</span>
+                    Agregar miembro
+                </button>
+            </header>
 
-            {/* Form Modal */}
-            {showForm && (
-                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-                    <div className="card" style={{ width: '100%', maxWidth: 480, maxHeight: '90vh', overflow: 'auto' }}>
-                        <div style={{ background: 'var(--gradient-cta)', padding: '20px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <h3 style={{ color: 'white', fontWeight: 700 }}>{editing ? 'Editar Miembro' : 'Nuevo Miembro'}</h3>
-                            <button onClick={closeForm} style={{ background: 'none', border: 'none', color: 'white', fontSize: '1.5rem', cursor: 'pointer' }}>✕</button>
+            {loading ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {Array(3).fill(0).map((_, i) => (
+                        <div key={i} className="h-80 rounded-[3rem] bg-stone-100 animate-pulse" />
+                    ))}
+                </div>
+            ) : (
+                <div className="space-y-16">
+                    {/* Directors Section */}
+                    {directors.length > 0 && (
+                        <div>
+                            <p className="text-[10px] uppercase tracking-[0.25em] font-bold text-stone-300 mb-8 ml-1">Dirección</p>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                                {directors.map(s => (
+                                    <StaffCard key={s.id} member={s} onEdit={openEdit} onDelete={async (id) => { if (confirm('¿Desactivar miembro?')) { await deleteStaff(id); load(); } }} />
+                                ))}
+                            </div>
                         </div>
-                        <form onSubmit={handleSubmit} style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
-                            <div className="form-group">
-                                <label className="form-label">Nombre *</label>
-                                <input className="form-input" required value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="Lidia Martínez" />
-                            </div>
-                            <div className="form-group">
-                                <label className="form-label">Rol</label>
-                                <select className="form-input form-select" value={form.role} onChange={e => setForm(f => ({ ...f, role: e.target.value }))}>
-                                    <option value="staff">Especialista (Recibe citas)</option>
-                                    <option value="director">Directora (Sin link de citas)</option>
-                                </select>
-                            </div>
-                            <div className="form-group">
-                                <label className="form-label">Teléfono / WhatsApp</label>
-                                <input className="form-input" value={form.phone || ''} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} placeholder="+1 555 123 4567" />
-                            </div>
-                            {form.role !== 'director' && (
-                                <div className="form-group">
-                                    <label className="form-label">Slug de reservas</label>
-                                    <input className="form-input" value={form.booking_slug || ''} onChange={e => setForm(f => ({ ...f, booking_slug: e.target.value.toLowerCase().replace(/\s+/g, '-') }))} placeholder="lidia" />
-                                    <p className="text-xs text-muted">URL: domain.com/book/{form.booking_slug || 'slug'}</p>
+                    )}
+
+                    {/* Team Section */}
+                    <div>
+                        <p className="text-[10px] uppercase tracking-[0.25em] font-bold text-stone-300 mb-8 ml-1">Especialistas de Staff</p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {members.map(s => (
+                                <StaffCard key={s.id} member={s} onEdit={openEdit} onDelete={async (id) => { if (confirm('¿Desactivar miembro?')) { await deleteStaff(id); load(); } }} />
+                            ))}
+
+                            {/* Add New Placeholder */}
+                            <button
+                                onClick={openNew}
+                                className="h-full min-h-[320px] rounded-[3rem] border-2 border-dashed border-stone-200 bg-stone-50/50 flex flex-col items-center justify-center p-8 group hover:border-primary/40 hover:bg-primary/5 transition-all text-stone-300 hover:text-primary"
+                            >
+                                <div className="w-16 h-16 rounded-full bg-white shadow-soft-sm flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                                    <span className="material-symbols-outlined text-3xl">add</span>
                                 </div>
-                            )}
-                            <div style={{ display: 'flex', gap: 12 }}>
-                                <button className="btn btn-outline" type="button" onClick={closeForm}>Cancelar</button>
-                                <button className="btn btn-primary" type="submit" disabled={saving} style={{ flex: 1 }}>
-                                    {saving ? 'Guardando...' : editing ? 'Actualizar' : 'Crear Miembro'}
-                                </button>
-                            </div>
-                        </form>
+                                <span className="font-display italic text-xl">Agregar especialista</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
 
-            {loading ? (
-                <div className="grid-3">
-                    {[1, 2, 3].map(i => <div key={i} className="skeleton" style={{ height: 160 }} />)}
-                </div>
-            ) : (
-                <>
-                    {directors.length > 0 && (
-                        <div style={{ marginBottom: 24 }}>
-                            <p style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-neutral-400)', marginBottom: 12 }}>
-                                Dirección
-                            </p>
-                            <div className="grid-3">
-                                {directors.map(s => <StaffCard key={s.id} staff={s} onEdit={openEdit} onDelete={async (id) => { await deleteStaff(id); load(); }} />)}
+            {/* Modal Form */}
+            {showForm && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-stone-900/40 backdrop-blur-sm" onClick={closeForm} />
+
+                    <div className="bg-white rounded-[3rem] w-full max-w-lg max-h-[90vh] overflow-y-auto z-10 shadow-2xl relative animate-in fade-in zoom-in duration-300 scrollbar-hide">
+                        <header className="sticky top-0 bg-white/80 backdrop-blur-md px-10 py-8 border-b border-stone-100 flex items-center justify-between z-20">
+                            <button onClick={closeForm} className="w-10 h-10 rounded-full bg-stone-50 flex items-center justify-center text-stone-400 hover:text-primary transition-colors">
+                                <span className="material-symbols-outlined text-xl">close</span>
+                            </button>
+                            <h2 className="font-display italic text-2xl text-stone-800">
+                                {editing ? 'Editar Perfil' : 'Nuevo Miembro'}
+                            </h2>
+                            <div className="w-10"></div>
+                        </header>
+
+                        <form onSubmit={handleSubmit} className="p-10 space-y-8">
+                            {/* Avatar selection */}
+                            <div className="flex flex-col items-center gap-4">
+                                <div className="relative group">
+                                    <div
+                                        onClick={() => fileRef.current?.click()}
+                                        className="w-32 h-32 rounded-full bg-stone-50 border-4 border-white shadow-soft-lg overflow-hidden relative cursor-pointer group-hover:ring-4 group-hover:ring-primary/20 transition-all"
+                                    >
+                                        {imagePreview ? (
+                                            <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                                        ) : (
+                                            <div className="absolute inset-0 flex flex-col items-center justify-center text-stone-200">
+                                                <span className="material-symbols-outlined text-4xl">person</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => fileRef.current?.click()}
+                                        className="absolute bottom-1 right-1 w-10 h-10 rounded-full bg-primary text-white border-4 border-white flex items-center justify-center shadow-lg hover:scale-110 transition-transform"
+                                    >
+                                        <span className="material-symbols-outlined text-lg">photo_camera</span>
+                                    </button>
+                                </div>
+                                <input ref={fileRef} type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+                                <p className="text-[10px] text-stone-400 font-bold uppercase tracking-widest">Foto de Perfil</p>
                             </div>
-                        </div>
-                    )}
-                    <p style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-neutral-400)', marginBottom: 12 }}>
-                        Especialistas
-                    </p>
-                    <div className="grid-3">
-                        {members.map(s => <StaffCard key={s.id} staff={s} onEdit={openEdit} onDelete={async (id) => { await deleteStaff(id); load(); }} />)}
+
+                            <div className="space-y-6">
+                                <div className="space-y-2">
+                                    <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-widest ml-1">Nombre Completo</label>
+                                    <input
+                                        required
+                                        value={form.name}
+                                        onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                                        placeholder="Nombre del miembro"
+                                        className="w-full bg-stone-50 border border-stone-100 rounded-2xl px-6 py-4 text-sm font-display text-stone-700 outline-none focus:border-primary transition-all"
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-widest ml-1">Especialidad</label>
+                                    <input
+                                        value={form.specialty || ''}
+                                        onChange={e => setForm(f => ({ ...f, specialty: e.target.value }))}
+                                        placeholder="ej. Especialista en Nail Art"
+                                        className="w-full bg-stone-50 border border-stone-100 rounded-2xl px-6 py-4 text-sm font-display text-stone-700 outline-none focus:border-primary transition-all"
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-widest ml-1">WhatsApp de contacto</label>
+                                    <input
+                                        value={form.phone || ''}
+                                        onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
+                                        placeholder="+54 9 11 ..."
+                                        className="w-full bg-stone-50 border border-stone-100 rounded-2xl px-6 py-4 text-sm font-display text-stone-700 outline-none focus:border-primary transition-all"
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-widest ml-1">Rol en el Studio</label>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        {[
+                                            { value: 'staff', label: 'Especialista', desc: 'Atiende citas' },
+                                            { value: 'director', label: 'Director', desc: 'Admin total' }
+                                        ].map(opt => (
+                                            <button
+                                                key={opt.value}
+                                                type="button"
+                                                onClick={() => setForm(f => ({ ...f, role: opt.value }))}
+                                                className={`p-4 rounded-2xl border transition-all text-left ${form.role === opt.value ? 'bg-primary/5 border-primary shadow-soft-sm' : 'bg-stone-50 border-stone-100 text-stone-400'}`}
+                                            >
+                                                <p className={`text-sm font-bold font-display ${form.role === opt.value ? 'text-primary' : ''}`}>{opt.label}</p>
+                                                <p className="text-[10px] mt-1 italic">{opt.desc}</p>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {form.role !== 'director' && (
+                                    <div className="space-y-2">
+                                        <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-widest ml-1">ID para Link de Reservas</label>
+                                        <div className="relative">
+                                            <span className="absolute left-6 top-1/2 -translate-y-1/2 text-stone-300 text-sm font-display italic">/book/</span>
+                                            <input
+                                                value={form.booking_slug || ''}
+                                                onChange={e => setForm(f => ({ ...f, booking_slug: e.target.value.toLowerCase().replace(/\s+/g, '-') }))}
+                                                placeholder="alias"
+                                                className="w-full bg-stone-50 border border-stone-100 rounded-2xl pl-16 pr-6 py-4 text-sm font-display text-stone-700 outline-none focus:border-primary transition-all"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={saving || uploadingImage}
+                                className="w-full bg-stone-900 text-white py-5 rounded-full shadow-lg hover:shadow-xl active:scale-[0.98] transition-all flex items-center justify-center gap-3 font-display text-lg"
+                            >
+                                {uploadingImage ? 'Actualizando...' : saving ? 'Guardando...' : 'Guardar Perfil'}
+                                <span className="material-symbols-outlined text-xl">verified</span>
+                            </button>
+                        </form>
                     </div>
-                </>
+                </div>
             )}
         </div>
     );
 }
 
-function StaffCard({ staff: s, onEdit, onDelete }) {
+function StaffCard({ member: s, onEdit, onDelete }) {
+    const initials = s.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+
     return (
-        <div className="card card-elevated" style={{ overflow: 'hidden' }}>
-            <div style={{ background: 'var(--gradient-rose)', padding: '24px', textAlign: 'center' }}>
-                <div className="avatar" style={{ width: 64, height: 64, fontSize: '1.5rem', margin: '0 auto 12px' }}>
-                    {s.name.charAt(0)}
-                </div>
-                <h3 style={{ fontFamily: 'var(--font-display)', fontWeight: 600 }}>{s.name}</h3>
-                <span className={`badge ${s.role === 'director' ? 'badge-pink' : 'badge-neutral'}`} style={{ marginTop: 6 }}>
-                    {s.role === 'director' ? 'Directora' : 'Especialista'}
-                </span>
+        <div className="bg-white rounded-[3rem] p-8 border border-stone-100 shadow-soft-md hover:shadow-soft-lg transition-all group relative">
+            <div className="absolute top-6 right-6 flex gap-2">
+                <button
+                    onClick={() => onEdit(s)}
+                    className="w-10 h-10 rounded-full bg-stone-50 flex items-center justify-center text-stone-400 hover:text-primary transition-all opacity-0 group-hover:opacity-100"
+                >
+                    <span className="material-symbols-outlined text-lg">edit</span>
+                </button>
+                <button
+                    onClick={() => onDelete(s.id)}
+                    className="w-10 h-10 rounded-full bg-stone-50 flex items-center justify-center text-red-200 hover:text-red-400 transition-all opacity-0 group-hover:opacity-100"
+                >
+                    <span className="material-symbols-outlined text-lg">delete</span>
+                </button>
             </div>
-            <div className="card-body">
-                {s.phone && <p className="text-sm" style={{ marginBottom: 4 }}>📱 {s.phone}</p>}
-                {s.booking_slug && (
-                    <a
-                        href={`/book/${s.booking_slug}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        style={{ fontSize: '0.8rem', color: 'var(--brand-deep)', display: 'block', marginBottom: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-                    >
-                        🔗 /book/{s.booking_slug}
-                    </a>
-                )}
-                {!s.booking_slug && s.role !== 'director' && (
-                    <p className="text-xs text-muted" style={{ marginBottom: 8 }}>Sin link de reservas asignado</p>
-                )}
-                <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
-                    <button className="btn btn-outline btn-sm" style={{ flex: 1 }} onClick={() => onEdit(s)}>✏️ Editar</button>
-                    <button className="btn btn-ghost btn-sm" onClick={() => onDelete(s.id)} style={{ color: '#b91c1c' }}>🗑</button>
+
+            <div className="flex flex-col items-center text-center">
+                <div className="w-24 h-24 rounded-full border-4 border-stone-50 bg-stone-50 shadow-soft-sm overflow-hidden mb-6 group-hover:scale-105 transition-transform">
+                    {s.profile_image ? (
+                        <img src={s.profile_image} alt={s.name} className="w-full h-full object-cover" />
+                    ) : (
+                        <div className="w-full h-full flex items-center justify-center text-stone-200 font-display text-2xl font-bold bg-white">
+                            {initials}
+                        </div>
+                    )}
+                </div>
+
+                <div className="mb-2">
+                    <h3 className="text-xl font-display font-bold text-stone-800 italic leading-tight">{s.name}</h3>
+                    <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-primary mt-1">{s.role === 'director' ? 'Directora' : 'Especialista'}</p>
+                </div>
+
+                <p className="text-stone-400 text-[13px] italic mb-6 line-clamp-1 h-5">{s.specialty || 'Especialista NailFlow'}</p>
+
+                <div className="w-full space-y-3 pt-6 border-t border-stone-50">
+                    {s.phone && (
+                        <div className="flex items-center justify-center gap-2 text-stone-400 text-xs font-medium">
+                            <span className="material-symbols-outlined text-sm">phone_iphone</span>
+                            {s.phone}
+                        </div>
+                    )}
+                    {s.booking_slug && s.role !== 'director' && (
+                        <div className="flex items-center justify-center gap-2">
+                            <a
+                                href={`/book/${s.booking_slug}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-[10px] font-bold text-primary bg-primary/5 px-4 py-2 rounded-full hover:bg-primary hover:text-white transition-all flex items-center gap-2"
+                            >
+                                <span className="material-symbols-outlined text-sm">link</span>
+                                nailflow.app/book/{s.booking_slug}
+                            </a>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

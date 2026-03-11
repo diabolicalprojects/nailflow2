@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS staff (
   name VARCHAR(255) NOT NULL,
   role VARCHAR(20) NOT NULL DEFAULT 'staff', -- 'director' or 'staff'
   phone VARCHAR(50),
+  specialty TEXT,
   profile_image TEXT,
   booking_slug VARCHAR(100) UNIQUE,
   is_active BOOLEAN DEFAULT true,

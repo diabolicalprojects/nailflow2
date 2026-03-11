@@ -42,14 +42,19 @@ async function seed() {
             ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash, business_id = EXCLUDED.business_id
         `, ['Lidia Martínez', 'lidia@nailflow.com', lidiaPass, 'owner', businessId]);
 
-    // Insert staff (Lidia, María, Ana)
+    // Add specialty column if it doesn't exist (migration for existing DBs)
     await client.query(`
-            INSERT INTO staff (business_id, name, role, phone, booking_slug, profile_image, is_active)
+        ALTER TABLE staff ADD COLUMN IF NOT EXISTS specialty TEXT
+    `);
+
+    // Insert staff (Lidia, María, Ana) with specialties
+    await client.query(`
+            INSERT INTO staff (business_id, name, role, phone, booking_slug, profile_image, specialty, is_active)
             VALUES 
-                ($1, 'Lidia Martínez', 'director', '+521234567890', 'lidia-owner', null, true),
-                ($1, 'María García', 'staff', '+521098765432', 'maria', null, true),
-                ($1, 'Ana Martínez', 'staff', '+521122334455', 'ana-nailart', null, true)
-            ON CONFLICT (booking_slug) DO UPDATE SET name = EXCLUDED.name, role = EXCLUDED.role
+                ($1, 'Lidia Martínez', 'director', '+521234567890', 'lidia-owner', null, 'Experta en PolyGel & Nail Art Premium', true),
+                ($1, 'María García', 'staff', '+521098765432', 'maria', null, 'Especialista en Uñas Acrílicas & Diseño', true),
+                ($1, 'Ana Martínez', 'staff', '+521122334455', 'ana-nailart', null, 'Nail Art 3D & Técnicas Japonesas', true)
+            ON CONFLICT (booking_slug) DO UPDATE SET name = EXCLUDED.name, role = EXCLUDED.role, specialty = EXCLUDED.specialty
         `, [businessId]);
 
     // Insert services

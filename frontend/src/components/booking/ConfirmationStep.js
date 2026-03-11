@@ -1,67 +1,102 @@
 'use client';
 
-export default function ConfirmationStep({ booking, onUploadImages }) {
+export default function ConfirmationStep({ booking, businessName = 'Ana Nails Studio' }) {
+    const formattedDate = new Date(booking.date).toLocaleDateString('es-ES', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+    });
+
     return (
-        <div className="animate-slide-up">
-            <div className="confetti-line" />
-
-            <div style={{ textAlign: 'center', marginBottom: 32 }}>
-                <div className="confirmation-icon">✅</div>
-                <h2 className="display-md text-gradient" style={{ marginBottom: 8 }}>
-                    ¡Cita Confirmada!
-                </h2>
-                <p style={{ color: 'var(--color-neutral-600)', fontSize: '1.0625rem' }}>
-                    Tu depósito fue procesado exitosamente
-                </p>
+        <div className="flex-1 flex flex-col items-center justify-between py-12 px-8 bg-bg-light min-h-[90vh] animate-fade-in relative overflow-hidden">
+            {/* Background elements */}
+            <div className="absolute top-0 right-0 p-12 opacity-[0.03] pointer-events-none">
+                <span className="material-symbols-outlined text-9xl">spa</span>
+            </div>
+            <div className="absolute bottom-0 left-0 p-12 opacity-[0.03] pointer-events-none">
+                <span className="material-symbols-outlined text-8xl">self_improvement</span>
             </div>
 
-            {/* Booking Summary Card */}
-            <div className="card card-elevated" style={{ marginBottom: 24 }}>
-                <div style={{ background: 'var(--gradient-cta)', padding: '16px 24px', borderRadius: 'var(--radius-lg) var(--radius-lg) 0 0' }}>
-                    <p style={{ color: 'white', fontWeight: 700, fontSize: '0.875rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                        Detalles de tu cita
-                    </p>
+            <div className="flex flex-col items-center mt-8 z-10">
+                <div className="relative w-32 h-32 flex items-center justify-center mb-8">
+                    <div className="absolute inset-0 bg-primary/20 rounded-full scale-110 animate-pulse"></div>
+                    {/* Flower accents */}
+                    <span className="material-symbols-outlined absolute -top-2 text-primary/60 text-xl">spa</span>
+                    <span className="material-symbols-outlined absolute -right-2 top-1/2 -translate-y-1/2 text-primary/60 text-xl">filter_vintage</span>
+                    <span className="material-symbols-outlined absolute -bottom-2 text-primary/60 text-xl">local_florist</span>
+                    <span className="material-symbols-outlined absolute -left-2 top-1/2 -translate-y-1/2 text-primary/60 text-xl">celebration</span>
+
+                    <div className="relative bg-white rounded-full p-6 shadow-soft-md ring-8 ring-white/50">
+                        <span className="material-symbols-outlined text-primary text-5xl font-light">check_circle</span>
+                    </div>
                 </div>
-                <div style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-                    {[
-                        { label: '💅 Servicio', value: booking.service?.name },
-                        { label: '📅 Fecha', value: booking.date },
-                        { label: '🕐 Hora', value: booking.time },
-                        { label: '💰 Depósito pagado', value: `$${Number(booking.depositAmount).toFixed(2)}` },
-                        { label: '📱 Confirmación enviada a', value: booking.clientPhone },
-                    ].map(item => item.value && (
-                        <div key={item.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ color: 'var(--color-neutral-500)', fontSize: '0.9rem' }}>{item.label}</span>
-                            <span style={{ fontWeight: 600, color: 'var(--color-neutral-800)', fontSize: '0.9375rem' }}>{item.value}</span>
+
+                <h1 className="font-display italic text-4xl text-stone-800 text-center leading-tight">
+                    ¡Tu cita está <br /> confirmada!
+                </h1>
+            </div>
+
+            <div className="w-full mt-10 z-10">
+                <div className="bg-white/70 backdrop-blur-md rounded-[2.5rem] p-8 shadow-soft-lg border border-white/50">
+                    <div className="text-center mb-8">
+                        <p className="text-[10px] uppercase tracking-[0.25em] text-stone-400 mb-2 font-bold">Tu cita en</p>
+                        <h2 className="font-display text-2xl text-stone-800 font-semibold">{businessName}</h2>
+                    </div>
+
+                    <div className="space-y-6">
+                        <div className="flex items-center gap-5 border-b border-stone-100 pb-4">
+                            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                <span className="material-symbols-outlined text-primary text-xl font-light">calendar_today</span>
+                            </div>
+                            <div>
+                                <p className="text-[9px] uppercase tracking-widest text-stone-400 font-bold">Fecha</p>
+                                <p className="text-sm font-display text-stone-700 font-medium capitalize">{formattedDate}</p>
+                            </div>
                         </div>
-                    ))}
+
+                        <div className="flex items-center gap-5 border-b border-stone-100 pb-4">
+                            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                <span className="material-symbols-outlined text-primary text-xl font-light">schedule</span>
+                            </div>
+                            <div>
+                                <p className="text-[9px] uppercase tracking-widest text-stone-400 font-bold">Hora</p>
+                                <p className="text-sm font-display text-stone-700 font-medium">{booking.time} HS</p>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-5">
+                            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                <span className="material-symbols-outlined text-primary text-xl font-light">auto_awesome</span>
+                            </div>
+                            <div>
+                                <p className="text-[9px] uppercase tracking-widest text-stone-400 font-bold">Servicio</p>
+                                <p className="text-sm font-display text-stone-700 font-medium">{booking.service?.name}</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            {/* Upload CTA */}
-            <div className="card" style={{
-                background: 'var(--gradient-rose)',
-                border: '1px solid var(--color-pink-200)',
-                padding: 24,
-                textAlign: 'center',
-                marginBottom: 24,
-            }}>
-                <p style={{ fontSize: '2rem', marginBottom: 8 }}>🖼️</p>
-                <h3 style={{ fontFamily: 'var(--font-display)', fontWeight: 600, marginBottom: 8, color: 'var(--color-neutral-900)' }}>
-                    Sube tus fotos de referencia
-                </h3>
-                <p style={{ color: 'var(--color-neutral-600)', fontSize: '0.9rem', marginBottom: 16 }}>
-                    Comparte el diseño que tienes en mente. Las fotos se eliminan automáticamente después de 14 días.
+            <div className="mt-8 px-4 text-center z-10">
+                <p className="text-stone-400 text-xs font-medium leading-relaxed italic">
+                    Te hemos enviado los detalles y el recordatorio a tu WhatsApp
                 </p>
-                <button className="btn btn-primary" onClick={onUploadImages}>
-                    Subir fotos →
-                </button>
             </div>
 
-            <div style={{ textAlign: 'center' }}>
-                <p className="text-sm text-muted">
-                    ¿Preguntas? Contáctanos por WhatsApp
-                </p>
+            <div className="w-full mt-10 space-y-4 z-10">
+                <button className="w-full bg-white text-stone-600 py-4 rounded-full flex items-center justify-center gap-3 transition-all active:scale-[0.98] border border-stone-100 shadow-soft">
+                    <span className="material-symbols-outlined text-xl text-primary">event_available</span>
+                    <span className="font-display tracking-wide font-medium">Añadir a mi Calendario</span>
+                </button>
+
+                <div className="text-center pt-4">
+                    <button
+                        onClick={() => window.location.href = '/'}
+                        className="text-[11px] uppercase tracking-[0.2em] text-stone-300 hover:text-primary transition-colors font-bold"
+                    >
+                        Volver al inicio
+                    </button>
+                </div>
             </div>
         </div>
     );
