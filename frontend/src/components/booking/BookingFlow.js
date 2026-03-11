@@ -49,16 +49,32 @@ export default function BookingFlow({ staffSlug }) {
         async function load() {
             try {
                 setLoading(true);
-                const servicesData = await getServices();
+                const [servicesData, businessData] = await Promise.all([
+                    getServices(),
+                    import('../../lib/api').then(m => m.getBusiness())
+                ]);
+
                 setServices(servicesData);
+
+                if (businessData) {
+                    // Update CSS Variables
+                    if (businessData.brand_color_primary) {
+                        document.documentElement.style.setProperty('--color-pink-500', businessData.brand_color_primary);
+                        document.documentElement.style.setProperty('--color-primary', businessData.brand_color_primary);
+                    }
+                    if (businessData.brand_color_secondary) {
+                        document.documentElement.style.setProperty('--color-pink-200', businessData.brand_color_secondary);
+                        document.documentElement.style.setProperty('--color-secondary', businessData.brand_color_secondary);
+                    }
+                    setBooking(prev => ({ ...prev, businessName: businessData.name || 'NailFlow', logoUrl: businessData.logo_url }));
+                }
 
                 if (staffSlug) {
                     const staffData = await getStaffBySlug(staffSlug);
                     setStaff(staffData);
                     setBooking(prev => ({ ...prev, staffId: staffData.id }));
                 } else if (servicesData.length > 0) {
-                    // Default to first staff if no slug provided, or fetch all staff
-                    // For now, assume staffId is handled by backend or default
+                    // Default behavior
                 }
             } catch (err) {
                 setError('Failed to load booking data. Please try again.');
@@ -92,7 +108,8 @@ export default function BookingFlow({ staffSlug }) {
                 {currentStep === 0 && (
                     <SplashStep
                         onComplete={nextStep}
-                        businessName="NailFlow"
+                        businessName={booking.businessName || "NailFlow"}
+                        logoUrl={booking.logoUrl}
                     />
                 )}
 

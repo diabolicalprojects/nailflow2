@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 
-export default function SplashStep({ onComplete, businessName = 'NailFlow' }) {
+export default function SplashStep({ onComplete, businessName = 'NailFlow', logoUrl }) {
     useEffect(() => {
         const timer = setTimeout(() => {
             onComplete();
@@ -14,9 +14,15 @@ export default function SplashStep({ onComplete, businessName = 'NailFlow' }) {
         <div className="flex flex-col items-center justify-center min-h-screen p-6 bg-bg-light animate-fade-in">
             <div className="flex flex-col items-center justify-center w-full max-w-xs">
                 <div className="mb-6 flex items-center justify-center">
-                    <span className="material-symbols-outlined text-primary text-6xl font-light scale-110 animate-pulse">
-                        brush
-                    </span>
+                    {logoUrl ? (
+                        <div className="w-24 h-24 rounded-full overflow-hidden shadow-soft-lg border-4 border-white mb-4 animate-pulse">
+                            <img src={logoUrl} alt={businessName} className="w-full h-full object-cover" />
+                        </div>
+                    ) : (
+                        <span className="material-symbols-outlined text-primary text-6xl font-light scale-110 animate-pulse">
+                            brush
+                        </span>
+                    )}
                 </div>
                 <div className="text-center">
                     <h1 className="text-stone-800 text-4xl font-display font-light tracking-wide mb-2">

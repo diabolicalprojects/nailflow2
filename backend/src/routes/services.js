@@ -18,4 +18,18 @@ router.get('/', async (req, res) => {
     }
 });
 
+// GET /api/services/business - Get public business info
+router.get('/business', async (req, res) => {
+    try {
+        const result = await pool.query(
+            `SELECT name, logo_url, brand_color_primary, brand_color_secondary 
+             FROM businesses LIMIT 1`
+        );
+        res.json(result.rows[0] || {});
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to fetch business info' });
+    }
+});
+
 module.exports = router;

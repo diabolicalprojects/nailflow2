@@ -154,10 +154,11 @@ router.put('/staff/update', async (req, res) => {
     try {
         const { id, name, role, phone, booking_slug, is_active, profile_image, specialty } = req.body;
         const slug = role === 'director' ? null : booking_slug;
+        const active = is_active !== false; // default true if undefined
         const result = await pool.query(
             `UPDATE staff SET name=$1, role=$2, phone=$3, booking_slug=$4, is_active=$5, profile_image=$6, specialty=$7
        WHERE id=$8 RETURNING *`,
-            [name, role, phone, slug, is_active, profile_image, specialty, id]
+            [name, role, phone, slug, active, profile_image, specialty, id]
         );
         res.json(result.rows[0]);
     } catch (err) {

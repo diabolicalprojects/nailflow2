@@ -46,8 +46,11 @@ export default function DateTimeStep({ selectedDate, selectedTime, staffId, serv
         for (let d = 1; d <= numDays; d++) {
             const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
             const isSelected = date === dateStr;
-            const isToday = new Date().toISOString().split('T')[0] === dateStr;
-            const isPast = new Date(dateStr) < new Date(new Date().setHours(0, 0, 0, 0));
+
+            const todayObj = new Date();
+            const todayStr = `${todayObj.getFullYear()}-${String(todayObj.getMonth() + 1).padStart(2, '0')}-${String(todayObj.getDate()).padStart(2, '0')}`;
+            const isToday = todayStr === dateStr;
+            const isPast = new Date(dateStr + 'T00:00:00') < new Date(todayObj.setHours(0, 0, 0, 0));
 
             days.push(
                 <button
@@ -55,12 +58,12 @@ export default function DateTimeStep({ selectedDate, selectedTime, staffId, serv
                     disabled={isPast}
                     onClick={() => setDate(dateStr)}
                     className={`h-10 w-10 flex items-center justify-center text-sm rounded-full transition-all ${isSelected
-                            ? 'bg-primary text-white shadow-soft font-bold'
-                            : isToday
-                                ? 'text-primary font-bold border border-primary/20'
-                                : isPast
-                                    ? 'text-stone-200 cursor-not-allowed'
-                                    : 'text-stone-600 hover:bg-primary/10'
+                        ? 'bg-primary text-white shadow-soft font-bold'
+                        : isToday
+                            ? 'text-primary font-bold border border-primary/20'
+                            : isPast
+                                ? 'text-stone-200 cursor-not-allowed'
+                                : 'text-stone-600 hover:bg-primary/10'
                         }`}
                 >
                     {d}
@@ -122,10 +125,9 @@ export default function DateTimeStep({ selectedDate, selectedTime, staffId, serv
                 </div>
             </div>
 
-            {/* Times Section */}
             <section className="flex-1 overflow-y-auto">
                 <h3 className="font-display text-lg font-medium mb-4 text-stone-800 italic px-2">
-                    Horarios para el {new Date(date).toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}
+                    Horarios para el {new Date(date + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}
                 </h3>
 
                 {loading ? (
@@ -139,8 +141,8 @@ export default function DateTimeStep({ selectedDate, selectedTime, staffId, serv
                                 key={time}
                                 onClick={() => onSelect(date, time)}
                                 className={`py-3.5 px-4 rounded-[1.2rem] text-xs font-semibold transition-all border ${selectedTime === time
-                                        ? 'bg-primary text-white border-primary shadow-soft'
-                                        : 'bg-white/40 border-stone-100 text-stone-600 hover:border-primary/40'
+                                    ? 'bg-primary text-white border-primary shadow-soft'
+                                    : 'bg-white/40 border-stone-100 text-stone-600 hover:border-primary/40'
                                     }`}
                             >
                                 {time}

@@ -18,6 +18,7 @@ api.interceptors.request.use(config => {
 });
 
 // Services
+export const getBusiness = () => api.get('/api/services/business').then(r => r.data);
 export const getServices = () => api.get('/api/services').then(r => r.data);
 
 // Staff

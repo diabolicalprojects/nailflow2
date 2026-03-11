@@ -77,9 +77,10 @@ router.post('/upload', upload.array('images', 10), async (req, res) => {
             });
 
             const cdnData = cdnResponse.data;
-            const imageUrl = Array.isArray(cdnData.uploaded)
-                ? cdnData.uploaded[0]?.url
-                : cdnData.url;
+            const imageUrl = cdnData.urls?.[0] ||
+                (Array.isArray(cdnData.uploaded) ? cdnData.uploaded[0]?.url : null) ||
+                cdnData.url ||
+                cdnData.data?.url;
 
             if (imageUrl) {
                 if (!isAdminUpload) {
