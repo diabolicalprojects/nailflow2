@@ -37,6 +37,34 @@
   --shadow-sm: 0 4px 12px rgba(230, 164, 180, 0.08);
   --shadow-md: 0 12px 32px rgba(230, 164, 180, 0.15);
   --shadow-lg: 0 24px 64px rgba(230, 164, 180, 0.2);
+
+  /* Gradients */
+  --gradient-cta: linear-gradient(135deg, #E6A4B4 0%, #FBCFE8 100%);
+  --gradient-hero: radial-gradient(circle at top right, #FAF3F0 0%, #FBE7E7 100%);
+  --gradient-rose: linear-gradient(180deg, rgba(230, 164, 180, 0.05) 0%, rgba(230, 164, 180, 0) 100%);
+
+  /* Brand Deep */
+  --brand-deep: #4B3F3A;
+
+  /* Pink Shades */
+  --color-pink-50: #FFF5F7;
+  --color-pink-100: #FFE4E9;
+  --color-pink-200: #FFC9D4;
+  --color-pink-500: #E6A4B4;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+
+  /* Transitions */
+  --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body {
