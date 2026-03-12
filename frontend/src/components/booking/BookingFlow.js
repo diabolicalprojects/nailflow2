@@ -10,7 +10,7 @@ import SummaryStep from './SummaryStep';
 import PaymentStep from './PaymentStep';
 import ConfirmationStep from './ConfirmationStep';
 import MobileContainer from '../ui/MobileContainer';
-import { getStaffBySlug, getServices } from '../../lib/api';
+import { getStaffBySlug, getServices, uploadReferenceImages } from '../../lib/api';
 
 const STEPS = [
     { key: 'splash', label: 'Inicio' },
@@ -57,7 +57,6 @@ export default function BookingFlow({ staffSlug }) {
                 setServices(servicesData);
 
                 if (businessData) {
-                    // Update CSS Variables
                     if (businessData.brand_color_primary) {
                         document.documentElement.style.setProperty('--color-pink-500', businessData.brand_color_primary);
                         document.documentElement.style.setProperty('--color-primary', businessData.brand_color_primary);
@@ -94,6 +93,23 @@ export default function BookingFlow({ staffSlug }) {
 
     const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, STEPS.length - 1));
     const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 0));
+
+    // Upload reference images AFTER payment succeeds (backend requires payment_status = 'paid')
+    const handlePaymentSuccess = async (bookingId, depositAmount) => {
+        updateBooking({ bookingId, depositAmount });
+
+        if (booking.referenceImages && booking.referenceImages.length > 0) {
+            try {
+                await uploadReferenceImages(bookingId, booking.referenceImages);
+                console.log('Reference images uploaded successfully after payment');
+            } catch (err) {
+                // Non-blocking — booking confirmation still proceeds
+                console.error('Failed to upload reference images:', err);
+            }
+        }
+
+        nextStep();
+    };
 
     if (loading) {
         return (
@@ -175,10 +191,7 @@ export default function BookingFlow({ staffSlug }) {
                     <PaymentStep
                         booking={booking}
                         onUpdate={updateBooking}
-                        onSuccess={(bookingId, depositAmount) => {
-                            updateBooking({ bookingId, depositAmount });
-                            nextStep();
-                        }}
+                        onSuccess={handlePaymentSuccess}
                         onBack={prevStep}
                     />
                 )}

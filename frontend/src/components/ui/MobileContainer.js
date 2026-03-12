@@ -21,7 +21,7 @@ export default function MobileContainer({ children }) {
 
                 {/* Right Side - Booking Flow */}
                 <div className="flex-1 flex flex-col h-full bg-white relative overflow-y-auto w-full md:w-1/2 lg:w-[60%] pb-12 md:pb-0 hide-scrollbar">
-                    <div className="mx-auto w-full max-w-lg md:max-w-none px-6 md:px-16 lg:px-24 xl:px-32 h-full flex flex-col">
+                    <div className="w-full px-6 md:px-16 lg:px-24 xl:px-32 h-full flex flex-col">
                         {children}
                     </div>
                 </div>

@@ -41,8 +41,12 @@ export const uploadReferenceImages = (bookingId, files) => {
     const form = new FormData();
     form.append('booking_id', bookingId);
     files.forEach(file => form.append('images', file));
+    const token = typeof window !== 'undefined' ? localStorage.getItem('nailflow_token') : null;
     return axios.post(`${API_URL}/api/reference-images/upload`, form, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+        headers: {
+            'Content-Type': 'multipart/form-data',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         timeout: 60000,
     }).then(r => r.data);
 };

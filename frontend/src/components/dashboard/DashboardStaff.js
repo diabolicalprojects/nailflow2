@@ -294,13 +294,13 @@ function StaffCard({ member: s, onEdit, onDelete }) {
             <div className="absolute top-6 right-6 flex gap-2">
                 <button
                     onClick={() => onEdit(s)}
-                    className="w-10 h-10 rounded-full bg-stone-50 flex items-center justify-center text-stone-400 hover:text-primary transition-all opacity-0 group-hover:opacity-100"
+                    className="w-10 h-10 rounded-full bg-stone-50 flex items-center justify-center text-stone-400 hover:text-primary transition-all"
                 >
                     <span className="material-symbols-outlined text-lg">edit</span>
                 </button>
                 <button
                     onClick={() => onDelete(s.id)}
-                    className="w-10 h-10 rounded-full bg-stone-50 flex items-center justify-center text-red-200 hover:text-red-400 transition-all opacity-0 group-hover:opacity-100"
+                    className="w-10 h-10 rounded-full bg-stone-50 flex items-center justify-center text-red-200 hover:text-red-400 transition-all"
                 >
                     <span className="material-symbols-outlined text-lg">delete</span>
                 </button>

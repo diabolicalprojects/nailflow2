@@ -29,12 +29,13 @@ router.use(authMiddleware);
 // GET /api/dashboard/bookings
 router.get('/bookings', async (req, res) => {
     try {
-        const { status, date_from, date_to } = req.query;
+        const { status, date_from, date_to, client_name } = req.query;
         let query = `
       SELECT b.*, 
         c.name as client_name, c.phone as client_phone,
         s.name as staff_name, s.profile_image as staff_image,
         sv.name as service_name, sv.price, sv.image_url as service_image,
+        sv.duration_minutes,
         json_agg(ri.image_url) FILTER (WHERE ri.id IS NOT NULL) as reference_images
       FROM bookings b
       JOIN clients c ON b.client_id = c.id
@@ -57,10 +58,14 @@ router.get('/bookings', async (req, res) => {
             params.push(date_to);
             conditions.push(`b.booking_date <= $${params.length}`);
         }
+        if (client_name) {
+            params.push(`%${client_name}%`);
+            conditions.push(`c.name ILIKE $${params.length}`);
+        }
         if (conditions.length > 0) {
             query += ' WHERE ' + conditions.join(' AND ');
         }
-        query += ' GROUP BY b.id, c.name, c.phone, s.name, sv.name, sv.price ORDER BY b.booking_date DESC, b.start_time ASC';
+        query += ' GROUP BY b.id, c.name, c.phone, s.id, s.name, s.profile_image, sv.id, sv.name, sv.price, sv.image_url, sv.duration_minutes ORDER BY b.booking_date DESC, b.start_time ASC';
 
         const result = await pool.query(query, params);
         res.json(result.rows);

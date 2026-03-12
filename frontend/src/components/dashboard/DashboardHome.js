@@ -44,7 +44,7 @@ export default function DashboardHome() {
                 setStats(s);
                 // Filter for today's bookings
                 const today = new Date().toISOString().split('T')[0];
-                const sorted = b.sort((a, b) => a.start_time.localeCompare(b.start_time));
+                const sorted = b.sort((a, b) => (a.start_time || '').localeCompare(b.start_time || ''));
                 setRecentBookings(sorted);
             })
             .catch(console.error)
@@ -148,9 +148,9 @@ export default function DashboardHome() {
                             recentBookings.map(b => (
                                 <div key={b.id} className="bg-white hover:bg-white/80 p-6 rounded-[2.5rem] shadow-soft-sm border border-stone-100 flex items-center gap-8 group cursor-pointer transition-all hover:scale-[1.01]">
                                     <div className="flex flex-col items-center justify-center min-w-[70px] border-r border-stone-100 pr-8">
-                                        <p className="text-xl font-bold font-display leading-tight text-stone-900">{b.start_time.slice(0, 5)}</p>
+                                        <p className="text-xl font-bold font-display leading-tight text-stone-900">{b.start_time?.slice(0, 5) || '--:--'}</p>
                                         <p className="text-[10px] text-stone-400 font-bold uppercase tracking-tighter">
-                                            {parseInt(b.start_time.split(':')[0]) < 12 ? 'AM' : 'PM'}
+                                            {parseInt((b.start_time || '12:00').split(':')[0]) < 12 ? 'AM' : 'PM'}
                                         </p>
                                     </div>
                                     <div className="w-14 h-14 rounded-2xl bg-stone-50 flex items-center justify-center overflow-hidden border border-stone-100 shadow-soft-sm">

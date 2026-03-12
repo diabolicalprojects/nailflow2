@@ -157,7 +157,7 @@ export default function ClientManagement() {
                                                 <div>
                                                     <p className="text-xs font-bold text-stone-700 uppercase tracking-tighter">{h.service_name}</p>
                                                     <p className="text-[10px] text-stone-400 font-bold uppercase tracking-widest mt-1">
-                                                        {new Date(h.booking_date).toLocaleDateString()} • {h.start_time.slice(0, 5)}
+                                                        {new Date(h.booking_date).toLocaleDateString()} • {h.start_time?.slice(0, 5) || '--:--'}
                                                     </p>
                                                 </div>
                                                 <div className={`text-[9px] font-bold px-3 py-1 rounded-full uppercase tracking-tighter ${h.payment_status === 'paid' ? 'bg-green-100 text-green-600' : 'bg-primary/10 text-primary'}`}>

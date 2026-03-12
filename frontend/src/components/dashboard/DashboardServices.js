@@ -164,7 +164,7 @@ export default function DashboardServices() {
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-10 animate-in fade-in duration-300">
                     <div className="absolute inset-0 bg-stone-950/40 backdrop-blur-md" onClick={closeForm} />
 
-                    <div className="bg-white rounded-[3.5rem] w-full max-w-3xl max-h-[90vh] overflow-y-auto z-10 shadow-2xl relative animate-in slide-in-from-bottom-8 duration-500 scrollbar-hide">
+                    <div className="bg-white rounded-[3.5rem] w-full max-w-3xl max-h-[95vh] overflow-y-auto z-10 shadow-2xl relative animate-in slide-in-from-bottom-8 duration-500 scrollbar-hide">
                         <header className="sticky top-0 bg-white/90 backdrop-blur-md px-12 py-8 border-b border-stone-100 flex items-center justify-between z-20">
                             <button onClick={closeForm} className="w-12 h-12 rounded-full bg-stone-50 flex items-center justify-center text-stone-400 hover:text-stone-900 transition-all border border-stone-100">
                                 <span className="material-symbols-outlined text-xl">close</span>
