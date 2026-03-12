@@ -161,21 +161,21 @@ export default function DashboardServices() {
 
             {/* Modal Form */}
             {showForm && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 min-h-screen">
-                    <div className="absolute inset-0 bg-stone-900/40 backdrop-blur-sm" onClick={closeForm} />
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-10 animate-in fade-in duration-300">
+                    <div className="absolute inset-0 bg-stone-950/40 backdrop-blur-md" onClick={closeForm} />
 
-                    <div className="bg-white rounded-[3rem] w-full max-w-2xl max-h-[90vh] overflow-y-auto z-10 shadow-2xl relative animate-in fade-in zoom-in duration-300 scrollbar-hide">
-                        <header className="sticky top-0 bg-white/80 backdrop-blur-md px-10 py-8 border-b border-stone-100 flex items-center justify-between z-20">
-                            <button onClick={closeForm} className="w-10 h-10 rounded-full bg-stone-50 flex items-center justify-center text-stone-400 hover:text-primary transition-colors">
+                    <div className="bg-white rounded-[3.5rem] w-full max-w-3xl max-h-[90vh] overflow-y-auto z-10 shadow-2xl relative animate-in slide-in-from-bottom-8 duration-500 scrollbar-hide">
+                        <header className="sticky top-0 bg-white/90 backdrop-blur-md px-12 py-8 border-b border-stone-100 flex items-center justify-between z-20">
+                            <button onClick={closeForm} className="w-12 h-12 rounded-full bg-stone-50 flex items-center justify-center text-stone-400 hover:text-stone-900 transition-all border border-stone-100">
                                 <span className="material-symbols-outlined text-xl">close</span>
                             </button>
-                            <h2 className="font-display italic text-2xl text-stone-800">
-                                {editing ? 'Editar Servicio' : 'Nuevo Servicio'}
+                            <h2 className="font-display italic text-3xl text-stone-800">
+                                {editing ? 'Refinar Servicio' : 'Nuevo Servicio'}
                             </h2>
-                            <div className="w-10"></div>
+                            <div className="w-12"></div>
                         </header>
 
-                        <form onSubmit={handleSubmit} className="p-10 space-y-8">
+                        <form onSubmit={handleSubmit} className="p-12 space-y-10">
                             {/* Image Selection */}
                             <div className="flex flex-col items-center gap-4">
                                 <div

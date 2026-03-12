@@ -11,7 +11,7 @@ const PAYMENT_METHODS = [
 ];
 
 export default function PaymentStep({ booking, onUpdate, onSuccess, onBack }) {
-    const [method, setMethod] = useState('credit_card');
+    const [method, setMethod] = useState('test');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
@@ -130,8 +130,10 @@ export default function PaymentStep({ booking, onUpdate, onSuccess, onBack }) {
                         <span className="spinner w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></span>
                     ) : (
                         <>
-                            <span className="material-symbols-outlined text-base">lock</span>
-                            <span className="font-display font-medium tracking-wide text-lg">Confirmar Pago Seguro</span>
+                            <span className="material-symbols-outlined text-base">{method === 'test' ? 'check_circle' : 'lock'}</span>
+                            <span className="font-display font-medium tracking-wide text-lg">
+                                {method === 'test' ? 'Confirmar Reserva (Demo)' : 'Confirmar Pago Seguro'}
+                            </span>
                         </>
                     )}
                 </button>

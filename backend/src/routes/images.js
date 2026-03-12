@@ -60,6 +60,8 @@ router.post('/upload', upload.array('images', 10), async (req, res) => {
     const uploadedImages = [];
     const errors = [];
 
+    console.log(`Starting CDN upload for ${req.files.length} images. Admin mode: ${isAdminUpload}`);
+
     for (const file of req.files) {
         try {
             const form = new FormData();
@@ -68,6 +70,7 @@ router.post('/upload', upload.array('images', 10), async (req, res) => {
                 contentType: file.mimetype,
             });
 
+            console.log(`Uploading file ${file.originalname} to CDN...`);
             const cdnResponse = await axios.post(CDN_UPLOAD_URL, form, {
                 headers: {
                     ...form.getHeaders(),
@@ -77,38 +80,66 @@ router.post('/upload', upload.array('images', 10), async (req, res) => {
             });
 
             const cdnData = cdnResponse.data;
-            const imageUrl = cdnData.urls?.[0] ||
-                (Array.isArray(cdnData.uploaded) ? cdnData.uploaded[0]?.url : null) ||
-                cdnData.url ||
-                cdnData.data?.url;
+            console.log('CDN Response received:', JSON.stringify(cdnData));
+
+            // Extract URL from various possible response formats
+            let imageUrl = null;
+            if (cdnData.urls && cdnData.urls[0]) {
+                imageUrl = cdnData.urls[0];
+            } else if (Array.isArray(cdnData.uploaded) && cdnData.uploaded[0]?.url) {
+                imageUrl = cdnData.uploaded[0].url;
+            } else if (cdnData.url) {
+                imageUrl = cdnData.url;
+            } else if (cdnData.data?.url) {
+                imageUrl = cdnData.data.url;
+            } else if (cdnData.uploaded?.[0]?.url) {
+                imageUrl = cdnData.uploaded[0].url;
+            }
 
             if (imageUrl) {
+                console.log(`Success! Image URL: ${imageUrl}`);
+
+                // Ensure the URL is absolute and use HTTPS
+                if (imageUrl.startsWith('//')) imageUrl = 'https:' + imageUrl;
+
+                // Append API key for display authorization as per CDN guide
+                const separator = imageUrl.includes('?') ? '&' : '?';
+                const finalUrl = `${imageUrl}${separator}api_key=${apiKey}`;
+
+                // If it's a reference image, store in DB
                 if (!isAdminUpload) {
-                    // Store in DB with 14-day expiration for reference images
                     const dbResult = await pool.query(
                         `INSERT INTO reference_images (booking_id, image_url, cdn_filename, expires_at)
-             VALUES ($1, $2, $3, NOW() + INTERVAL '14 days')
-             RETURNING id, image_url, uploaded_at, expires_at`,
-                        [booking_id, imageUrl, file.originalname]
+                         VALUES ($1, $2, $3, NOW() + INTERVAL '14 days')
+                         RETURNING id, image_url, uploaded_at, expires_at`,
+                        [booking_id, finalUrl, file.originalname]
                     );
                     uploadedImages.push(dbResult.rows[0]);
                 } else {
-                    // Admin uploads: just return URL
-                    uploadedImages.push({ image_url: imageUrl, url: imageUrl });
+                    // Admin uploads: return object with URL including API Key
+                    uploadedImages.push({ image_url: finalUrl, url: finalUrl });
                 }
+            } else {
+                console.warn('CDN upload succeeded but no URL was found in response:', cdnData);
+                errors.push({ file: file.originalname, error: 'No URL returned from CDN' });
             }
         } catch (fileErr) {
-            console.error('CDN upload error for file:', file.originalname, fileErr.message);
-            errors.push({ file: file.originalname, error: fileErr.message });
+            const errorMsg = fileErr.response?.data?.message || fileErr.response?.data?.error || fileErr.message;
+            console.error('CDN upload error for file:', file.originalname, errorMsg);
+            if (fileErr.response) {
+                console.error('CDN Error Details:', JSON.stringify(fileErr.response.data));
+            }
+            errors.push({ file: file.originalname, error: errorMsg });
         }
     }
 
+    const success = uploadedImages.length > 0;
     res.json({
-        success: true,
+        success,
         uploaded: uploadedImages,
         urls: uploadedImages.map(img => img.image_url || img.url),
         errors,
-        message: `${uploadedImages.length} image(s) uploaded successfully.`,
+        message: success ? `${uploadedImages.length} image(s) uploaded successfully.` : 'Failed to upload images.',
     });
 });
 

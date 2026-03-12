@@ -127,7 +127,11 @@ export default function DateTimeStep({ selectedDate, selectedTime, staffId, serv
 
             <section className="flex-1 overflow-y-auto">
                 <h3 className="font-display text-lg font-medium mb-4 text-stone-800 italic px-2">
-                    Horarios para el {new Date(date + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}
+                    Horarios para el {(() => {
+                        if (!date) return '';
+                        const [y, m, d] = date.split('-').map(Number);
+                        return new Date(y, m - 1, d).toLocaleDateString('es-ES', { day: 'numeric', month: 'long' });
+                    })()}
                 </h3>
 
                 {loading ? (
