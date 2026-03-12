@@ -47,20 +47,20 @@ router.post('/create', async (req, res) => {
             client_name, client_phone, client_email, notes
         } = req.body;
 
-        // Validate minimum 7 days in advance
-        const settings = await pool.query('SELECT booking_min_days FROM system_settings LIMIT 1');
-        const minDays = settings.rows[0]?.booking_min_days || 7;
-
-        const bookingDate = new Date(booking_date);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const daysDiff = Math.floor((bookingDate - today) / (1000 * 60 * 60 * 24));
-
-        if (daysDiff < minDays) {
-            return res.status(400).json({
-                error: `Bookings must be at least ${minDays} days in advance`
-            });
-        }
+        // Validate minimum days in advance (Disabled for Demo)
+        // const settings = await pool.query('SELECT booking_min_days FROM system_settings LIMIT 1');
+        // const minDays = settings.rows[0]?.booking_min_days || 7;
+        // 
+        // const bookingDate = new Date(booking_date);
+        // const today = new Date();
+        // today.setHours(0, 0, 0, 0);
+        // const daysDiff = Math.floor((bookingDate - today) / (1000 * 60 * 60 * 24));
+        // 
+        // if (daysDiff < minDays) {
+        //     return res.status(400).json({
+        //         error: `Bookings must be at least ${minDays} days in advance`
+        //     });
+        // }
 
         // Get service details for deposit calculation
         const serviceResult = await pool.query(

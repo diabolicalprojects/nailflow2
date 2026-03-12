@@ -280,11 +280,16 @@ function ServiceCard({ service, onEdit, onDelete }) {
     return (
         <div className="group bg-white rounded-[2.5rem] overflow-hidden border border-stone-100 shadow-soft-md hover:shadow-soft-lg transition-all flex flex-col">
             <div className="aspect-video relative overflow-hidden">
-                {service.image_url ? (
-                    <img src={service.image_url} alt={service.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                ) : (
+                {service.image_url && !service.image_url.startsWith('/uploads') ? (
+                    <img src={service.image_url} alt={service.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }} />
+                ) : null}
+                {(!service.image_url || service.image_url.startsWith('/uploads')) && (
                     <div className="w-full h-full bg-stone-50 flex items-center justify-center text-stone-200">
-                        <span className="material-symbols-outlined text-5xl">auto_awesome</span>
+                        {service.image_url && service.image_url.startsWith('/uploads') ? (
+                            <img src={`https://images.unsplash.com/photo-1604654894610-df490668711d?q=80&w=300&auto=format&fit=crop`} alt="Placeholder" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-60 mix-blend-multiply" />
+                        ) : (
+                            <span className="material-symbols-outlined text-5xl">auto_awesome</span>
+                        )}
                     </div>
                 )}
                 <div className="absolute top-4 right-4 flex gap-2">

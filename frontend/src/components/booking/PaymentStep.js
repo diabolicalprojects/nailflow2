@@ -7,6 +7,7 @@ const PAYMENT_METHODS = [
     { key: 'credit_card', label: 'TARJETA', icon: 'credit_card', desc: 'Crédito / Débito' },
     { key: 'apple_pay', label: 'APPLE PAY', icon: 'contactless', desc: 'Pago rápido' },
     { key: 'mercadopago', label: 'MERCADO', icon: 'wallet', desc: 'Mercado Pago' },
+    { key: 'test', label: 'PRUEBA', icon: 'bug_report', desc: 'Pago de prueba' },
 ];
 
 export default function PaymentStep({ booking, onUpdate, onSuccess, onBack }) {
@@ -67,8 +68,8 @@ export default function PaymentStep({ booking, onUpdate, onSuccess, onBack }) {
                                 key={pm.key}
                                 onClick={() => setMethod(pm.key)}
                                 className={`flex flex-col items-center justify-center py-5 rounded-2xl border-2 transition-all ${method === pm.key
-                                        ? 'border-primary bg-white shadow-soft-md'
-                                        : 'border-stone-100 bg-white/40 grayscale opacity-60'
+                                    ? 'border-primary bg-white shadow-soft-md'
+                                    : 'border-stone-100 bg-white/40 grayscale opacity-60'
                                     }`}
                             >
                                 <span className={`material-symbols-outlined mb-2 ${method === pm.key ? 'text-primary' : 'text-stone-300'}`}>

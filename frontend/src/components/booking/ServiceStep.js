@@ -20,15 +20,16 @@ export default function ServiceStep({ services, selected, onSelect, onBack }) {
                         key={service.id}
                         onClick={() => onSelect(service)}
                         className={`w-full flex items-center p-4 rounded-[28px] border transition-all duration-300 ${selected?.id === service.id
-                                ? 'bg-white border-primary shadow-soft-lg ring-1 ring-primary/20'
-                                : 'bg-white/40 border-transparent hover:border-primary/30 shadow-sm'
+                            ? 'bg-white border-primary shadow-soft-lg ring-1 ring-primary/20'
+                            : 'bg-white/40 border-transparent hover:border-primary/30 shadow-sm'
                             }`}
                     >
                         <div className="w-16 h-16 rounded-2xl overflow-hidden shrink-0 border border-stone-100 bg-stone-50">
                             <img
                                 alt={service.name}
                                 className="w-full h-full object-cover"
-                                src={service.image_url || `https://images.unsplash.com/photo-1604654894610-df490668711d?q=80&w=150&h=150&auto=format&fit=crop`}
+                                src={service.image_url && !service.image_url.startsWith('/uploads') ? service.image_url : `https://images.unsplash.com/photo-1604654894610-df490668711d?q=80&w=150&h=150&auto=format&fit=crop`}
+                                onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1604654894610-df490668711d?q=80&w=150&h=150&auto=format&fit=crop'; }}
                             />
                         </div>
                         <div className="ml-4 flex flex-col items-start text-left flex-1">
@@ -45,8 +46,8 @@ export default function ServiceStep({ services, selected, onSelect, onBack }) {
                                 ${service.price}
                             </span>
                             <div className={`w-6 h-6 rounded-full flex items-center justify-center transition-all ${selected?.id === service.id
-                                    ? 'bg-primary shadow-sm'
-                                    : 'border border-stone-200 bg-white/50'
+                                ? 'bg-primary shadow-sm'
+                                : 'border border-stone-200 bg-white/50'
                                 }`}>
                                 {selected?.id === service.id && (
                                     <span className="material-symbols-outlined text-white text-[16px] font-bold">check</span>

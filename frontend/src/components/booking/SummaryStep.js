@@ -131,8 +131,8 @@ export default function SummaryStep({ booking, staff, onUpdate, onNext, onBack }
                 </p>
             </section>
 
-            <div className="fixed bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-bg-light via-bg-light/95 to-transparent pt-20 pointer-events-none">
-                <div className="max-w-md mx-auto pointer-events-auto">
+            <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-white via-white/80 to-transparent pt-12 pointer-events-none z-10 w-full">
+                <div className="w-full mx-auto pointer-events-auto">
                     <button
                         onClick={handleConfirm}
                         disabled={loading}
