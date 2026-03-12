@@ -33,8 +33,8 @@ router.get('/bookings', async (req, res) => {
         let query = `
       SELECT b.*, 
         c.name as client_name, c.phone as client_phone,
-        s.name as staff_name,
-        sv.name as service_name, sv.price,
+        s.name as staff_name, s.profile_image as staff_image,
+        sv.name as service_name, sv.price, sv.image_url as service_image,
         json_agg(ri.image_url) FILTER (WHERE ri.id IS NOT NULL) as reference_images
       FROM bookings b
       JOIN clients c ON b.client_id = c.id

@@ -307,12 +307,24 @@ function StaffCard({ member: s, onEdit, onDelete }) {
             </div>
 
             <div className="flex flex-col items-center text-center">
-                <div className="w-24 h-24 rounded-full border-4 border-stone-50 bg-stone-50 shadow-soft-sm overflow-hidden mb-6 group-hover:scale-105 transition-transform">
-                    {s.profile_image && !s.profile_image.startsWith('/uploads') ? (
-                        <img src={s.profile_image} alt={s.name} className="w-full h-full object-cover" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }} />
+                <div className="w-24 h-24 rounded-full border-4 border-stone-50 bg-stone-50 shadow-soft-sm overflow-hidden mb-6 group-hover:scale-105 transition-transform flex items-center justify-center">
+                    {s.profile_image ? (
+                        <img
+                            src={s.profile_image}
+                            alt={s.name}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                                e.target.style.display = 'none';
+                                if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
+                            }}
+                        />
                     ) : null}
-                    {(!s.profile_image || s.profile_image.startsWith('/uploads')) && (
+                    {(!s.profile_image) ? (
                         <div className="w-full h-full flex items-center justify-center text-stone-300 font-display text-2xl font-bold bg-stone-100 italic">
+                            {initials}
+                        </div>
+                    ) : (
+                        <div className="hidden w-full h-full flex items-center justify-center text-stone-300 font-display text-2xl font-bold bg-stone-100 italic">
                             {initials}
                         </div>
                     )}

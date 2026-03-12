@@ -24,12 +24,14 @@ export default function ServiceStep({ services, selected, onSelect, onBack }) {
                             : 'bg-white/40 border-transparent hover:border-primary/30 shadow-sm'
                             }`}
                     >
-                        <div className="w-16 h-16 rounded-2xl overflow-hidden shrink-0 border border-stone-100 bg-stone-50">
+                        <div className="w-16 h-16 rounded-2xl overflow-hidden shrink-0 border border-stone-100 bg-stone-50 flex items-center justify-center">
                             <img
                                 alt={service.name}
                                 className="w-full h-full object-cover"
-                                src={service.image_url && !service.image_url.startsWith('/uploads') ? service.image_url : `https://images.unsplash.com/photo-1604654894610-df490668711d?q=80&w=150&h=150&auto=format&fit=crop`}
-                                onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1604654894610-df490668711d?q=80&w=150&h=150&auto=format&fit=crop'; }}
+                                src={service.image_url || `https://images.unsplash.com/photo-1604654894610-df490668711d?q=80&w=150&h=150&auto=format&fit=crop`}
+                                onError={(e) => {
+                                    e.target.src = 'https://images.unsplash.com/photo-1604654894610-df490668711d?q=80&w=150&h=150&auto=format&fit=crop';
+                                }}
                             />
                         </div>
                         <div className="ml-4 flex flex-col items-start text-left flex-1">

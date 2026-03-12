@@ -153,12 +153,25 @@ export default function DashboardHome() {
                                             {parseInt(b.start_time.split(':')[0]) < 12 ? 'AM' : 'PM'}
                                         </p>
                                     </div>
-                                    <div className="w-14 h-14 rounded-full bg-accent/20 flex items-center justify-center text-xl font-bold text-stone-600 shadow-soft-sm uppercase">
-                                        {b.client_name?.charAt(0)}
+                                    <div className="w-14 h-14 rounded-2xl bg-stone-50 flex items-center justify-center overflow-hidden border border-stone-100 shadow-soft-sm">
+                                        {b.service_image ? (
+                                            <img src={b.service_image} alt="" className="w-full h-full object-cover" />
+                                        ) : (
+                                            <span className="material-symbols-outlined text-stone-300">brush</span>
+                                        )}
                                     </div>
                                     <div className="flex-1">
                                         <p className="text-lg font-bold font-display text-stone-800 mb-0.5">{b.client_name}</p>
-                                        <p className="text-xs text-stone-400 italic font-medium">{b.service_name}</p>
+                                        <div className="flex items-center gap-2">
+                                            <p className="text-xs text-stone-400 italic font-medium">{b.service_name}</p>
+                                            <span className="text-[8px] text-stone-300">•</span>
+                                            <div className="flex items-center gap-1.5">
+                                                {b.staff_image && (
+                                                    <img src={b.staff_image} alt="" className="w-4 h-4 rounded-full object-cover" />
+                                                )}
+                                                <p className="text-[10px] text-stone-400 font-bold uppercase tracking-wider">{b.staff_name || 'Staff'}</p>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div className="flex items-center gap-4">
                                         <div className={`w-3 h-3 rounded-full ${b.payment_status === 'paid' ? 'bg-green-500 shadow-[0_0_12px_rgba(34,197,94,0.4)]' : 'bg-primary shadow-[0_0_12px_rgba(230,164,180,0.6)]'}`}></div>

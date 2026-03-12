@@ -157,6 +157,13 @@ export default function DashboardBookings() {
                                 {/* Service Spotlight */}
                                 <section className="relative">
                                     <div className="p-10 rounded-[3rem] bg-stone-900 text-white relative overflow-hidden shadow-2xl">
+                                        {selected.service_image && (
+                                            <img
+                                                src={selected.service_image}
+                                                alt=""
+                                                className="absolute inset-0 w-full h-full object-cover opacity-20 blur-[2px]"
+                                            />
+                                        )}
                                         <div className="absolute top-0 right-0 p-8 opacity-10">
                                             <span className="material-symbols-outlined text-8xl">auto_awesome</span>
                                         </div>

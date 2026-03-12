@@ -19,11 +19,20 @@ export default function WelcomeStep({ onNext, booking, onUpdate, staff }) {
                 <div className="relative mb-6">
                     <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-soft-lg bg-stone-50 flex items-center justify-center">
                         {staff?.profile_image ? (
-                            <img
-                                alt={staff?.name || "Nail Tech"}
-                                className="w-full h-full object-cover"
-                                src={staff.profile_image}
-                            />
+                            <div className="w-full h-full relative">
+                                <img
+                                    alt={staff?.name || "Nail Tech"}
+                                    className="w-full h-full object-cover"
+                                    src={staff.profile_image}
+                                    onError={(e) => {
+                                        e.target.style.display = 'none';
+                                        e.target.nextSibling.style.display = 'flex';
+                                    }}
+                                />
+                                <div className="hidden absolute inset-0 items-center justify-center text-4xl text-stone-300 font-display italic">
+                                    {staff?.name?.charAt(0) || 'LM'}
+                                </div>
+                            </div>
                         ) : (
                             <span className="text-4xl text-stone-300 font-display italic">
                                 {staff?.name?.charAt(0) || 'LM'}
