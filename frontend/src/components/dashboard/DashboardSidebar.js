@@ -9,6 +9,7 @@ const NAV_ITEMS = [
     { key: 'services', label: 'Servicios', icon: 'auto_awesome' },
     { key: 'staff', label: 'Equipo', icon: 'group' },
     { key: 'payments', label: 'Pagos', icon: 'payments' },
+    { key: 'clients', label: 'Clientas', icon: 'face' },
     { key: 'settings', label: 'Perfil', icon: 'person' },
 ];
 

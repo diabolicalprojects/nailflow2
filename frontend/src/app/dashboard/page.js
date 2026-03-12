@@ -9,6 +9,7 @@ import DashboardStaff from '../../components/dashboard/DashboardStaff';
 import DashboardBookings from '../../components/dashboard/DashboardBookings';
 import DashboardPayments from '../../components/dashboard/DashboardPayments';
 import DashboardSettings from '../../components/dashboard/DashboardSettings';
+import ClientManagement from '../../components/dashboard/ClientManagement';
 
 const SECTIONS = {
     home: DashboardHome,
@@ -17,6 +18,7 @@ const SECTIONS = {
     staff: DashboardStaff,
     payments: DashboardPayments,
     settings: DashboardSettings,
+    clients: ClientManagement,
 };
 
 export default function DashboardPage() {
